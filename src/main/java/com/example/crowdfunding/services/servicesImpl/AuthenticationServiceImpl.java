@@ -19,7 +19,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -31,13 +33,22 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final JWTGenerator jwtGenerator;
 
     @Override
-    public ResponseEntity<String> register(RegisterDTO registerDTO) {
+    public ResponseEntity<String> register(RegisterDTO registerDTO) throws Exception{
         if (userRepository.existsByUserName(registerDTO.getUsername())) {
             return new ResponseEntity<>("Username is taken!", HttpStatus.BAD_REQUEST);
         }
         UserEntity user = new UserEntity();
         user.setUserName(registerDTO.getUsername());
-        user.setPassword(passwordEncoder.encode((registerDTO.getPassword())));
+//        user.setPassword(passwordEncoder.encode((registerDTO.getPassword())));
+        user.setPassword(registerDTO.getPassword());
+        user.setEmail(registerDTO.getEmail());
+        user.setCity(registerDTO.getCity());
+        user.setCountry(registerDTO.getCountry());
+        user.setStreet(registerDTO.getStreet());
+        user.setFirstName(registerDTO.getFirstname());
+        user.setLastName(registerDTO.getLastname());
+        user.setPhone(registerDTO.getPhone());
+
 
         Authority authority = authorityRepo.findByAuthorityName("USER").get();
         user.setAuthorities(Collections.singletonList(authority));
@@ -55,8 +66,19 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                         loginDTO.getPassword()
                 )
         );
+        System.out.println(authentication.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = jwtGenerator.generateToken(authentication);
-        return new ResponseEntity<>(new AuthResponseDTO(token), HttpStatus.OK);
+        UserEntity user = userRepository.getUserWithAuthorities(loginDTO.getUsername());
+        AuthResponseDTO authResponseDTO = new AuthResponseDTO(token);
+
+        List<Authority> authorities = user.getAuthorities();
+        List<String> roles = new ArrayList<>();
+
+        for(Authority authority : authorities){
+            roles.add(authority.getAuthorityName());
+        }
+        authResponseDTO.setRoles(roles);
+        return new ResponseEntity<>(authResponseDTO, HttpStatus.OK);
     }
 }

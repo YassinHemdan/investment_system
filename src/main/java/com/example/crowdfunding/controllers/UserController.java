@@ -16,11 +16,13 @@ import static com.example.crowdfunding.utils.ApiUri.USER_URI;
 @RestController
 @RequestMapping(USER_URI)
 @AllArgsConstructor
+@CrossOrigin(origins = "http://localhost:4200")
 public class UserController {
     private UserServiceImpl userService;
     @GetMapping("/portfolio")
-    public List<UserPortfolioDTO> Portfolio(Principal principal){
-        return userService.portfolio(principal.getName());
+    public List<UserPortfolioDTO> Portfolio(){
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userService.portfolio(username);
     }
     @GetMapping("/profile")
     public UserProfileDTO Profile(Principal principal) throws Exception {
@@ -45,5 +47,35 @@ public class UserController {
         var principal_name = SecurityContextHolder.getContext().getAuthentication().getName();
         userService.unfollow(principal_name, username);
         return new ResponseEntity<>("You have unfollowed " + username, HttpStatus.OK);
+    }
+
+
+    // TODO implement the following methods
+    @PutMapping("/edit-username/{username}")
+    public ResponseEntity<AuthResponseDTO> editUserName(@PathVariable(name = "username") String newUserName) throws Exception{
+            return userService.editUserName(newUserName);
+    }
+    @PutMapping("/edit-password/{password}")
+    public TestResponseDTO editPassword(@PathVariable(name = "password") String password){
+        userService.editPassword(password);
+        return new TestResponseDTO("password updated successfully", HttpStatus.OK);
+    }
+    @PutMapping("/edit-email/{email}")
+    public TestResponseDTO editEmail(@PathVariable(name = "email") String email){
+        try {
+            userService.editEmail(email);
+        }catch (Exception e){
+            return new TestResponseDTO("email is already exists", HttpStatus.BAD_REQUEST);
+        }
+        return new TestResponseDTO("email updated successfully", HttpStatus.OK);
+    }
+    @PutMapping("/edit-phone/{phone}")
+    public TestResponseDTO editPhone(@PathVariable(name = "phone") String phone){
+        try{
+            userService.editPhone(phone);
+        }catch (Exception e){
+            return new TestResponseDTO("phone is already exists" ,HttpStatus.BAD_REQUEST);
+        }
+        return new TestResponseDTO("phone updated successfully", HttpStatus.OK);
     }
 }

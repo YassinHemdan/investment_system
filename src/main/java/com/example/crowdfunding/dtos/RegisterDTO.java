@@ -10,4 +10,7 @@ public class RegisterDTO {
     private String firstname;
     private String email;
     private String phone;
+    private String country;
+    private String street;
+    private String city;
 }

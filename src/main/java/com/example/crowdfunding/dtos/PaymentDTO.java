@@ -17,5 +17,4 @@ public class PaymentDTO {
     private int numberOfTokens;
     private String cardNumber;
     private String cardType;
-    private LocalTime expiredDate;
 }

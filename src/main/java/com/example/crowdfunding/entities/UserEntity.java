@@ -8,20 +8,33 @@ import java.util.List;
 
 @NamedNativeQuery(
         name = "UserEntity.portfolio",
-        query = "WITH query1 AS ("
-                +"SELECT COUNT(*) AS \"total tokens\" , qd.department_id, qd.size - COUNT(*) AS \"availableArea\" "+
-                "FROM tokens qt JOIN departments qd ON qd.department_id = qt.department_id GROUP BY qd.department_id " +
-                ")" +
-                "SELECT d.department_id AS \"id\", d.country, d.city, " +
-                "d.street, d.size  AS \"area\",  MAX(p.price) AS \"price\"" +
-                ", MAX(p.price) / d.size  AS \"tokenPrice\", \"availableArea\" " +
-                "FROM departments d JOIN investments i " +
-                "ON i.department_id = d.department_id " +
-                "JOIN users u ON u.user_id = i.user_id " +
-                "JOIN price_history p ON p.department_id = d.department_id " +
-                "JOIN query1 ON query1.department_id = d.department_id " +
-                "WHERE u.user_id = :user_id " +
-                "GROUP BY d.department_id, d.country, d.city, d.street, \"area\" ,  \"availableArea\""
+            query = """
+                    WITH query1 AS (
+                                    SELECT COUNT(*) AS "total tokens" , qd.department_id, qd.size - COUNT(*) AS availableArea
+                                    FROM tokens qt JOIN departments qd ON qd.department_id = qt.department_id GROUP BY qd.department_id
+                                    )
+                    				, query2 as(
+                    							select d.department_id ,cast(count(t.department_id) as integer) as ownedTokens
+                    							from tokens t
+                    							join departments d on t.department_id = d.department_id
+                    							where user_id = :user_id
+                    							group by d.department_id
+                    				)
+                                    SELECT distinct on(p.department_id) d.department_id AS id, d.country, d.city,
+                                    d.street, d.size  AS area,  max(p.price) AS price
+                                    , MAX(p.price) / d.size  AS tokenPrice, availableArea
+                    				, ownedTokens
+                                    FROM departments d\s
+                    				JOIN investments i ON i.department_id = d.department_id
+                                    JOIN users u ON u.user_id = i.user_id
+                                    JOIN price_history p ON p.department_id = d.department_id
+                                    JOIN query1 ON query1.department_id = d.department_id
+                    				JOIN query2 ON query2.department_id = d.department_id
+                    			\t
+                                    WHERE u.user_id = :user_id
+                                    GROUP BY p.department_id, p.date, d.department_id, d.country, d.city, d.street, area , availableArea,
+                    				ownedTokens
+                   \s"""
         ,
         resultSetMapping = "Mapping.UserPortfolioDTO"
 )
@@ -37,7 +50,8 @@ import java.util.List;
                         @ColumnResult(name = "area"),
                         @ColumnResult(name = "availableArea"),
                         @ColumnResult(name = "price"),
-                        @ColumnResult(name = "tokenPrice")
+                        @ColumnResult(name = "tokenPrice"),
+                        @ColumnResult(name = "ownedTokens")
                 }
         )
 )
@@ -49,7 +63,7 @@ import java.util.List;
 				CAST(COUNT(f.follower_id) AS INTEGER) AS numberOfFollowers
 				FROM users u
 				LEFT JOIN followers f ON u.user_id = f.user_id
-				WHERE u.user_id = 2
+				WHERE u.user_id = :user_id
 				GROUP BY u.user_id, u.username\s
 				"""
         ,
@@ -101,8 +115,6 @@ public class UserEntity extends BaseEntity{
     private String country;
     private String city;
     private String street;
-    @Column(name = "isadmin", nullable = false)
-    private boolean isAdmin;
 
     @OneToMany(mappedBy = "user")
     private List<Investment> investments;

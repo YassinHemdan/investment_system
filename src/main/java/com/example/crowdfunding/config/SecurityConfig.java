@@ -35,6 +35,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
+//                .cors(AbstractHttpConfigurer::disable)
                 .httpBasic(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .exceptionHandling(e -> e.authenticationEntryPoint(authEntryPoint))
@@ -42,9 +43,23 @@ public class SecurityConfig {
                 .authorizeHttpRequests
                         (
                                 authorize -> authorize
+                                        .requestMatchers("/api/v1/explore/investors").permitAll()
+                                        .requestMatchers("/api/v1/explore").permitAll()
                                         .requestMatchers("/api/v1/users/portfolio").hasAuthority("USER")
                                         .requestMatchers("/api/v1/auth/logout").authenticated()
-                                        .requestMatchers("/api/v1/auth/**").permitAll()
+                                        .requestMatchers(
+                                                "/api/v1/auth/**",
+                                                "/v2/api-docs",
+                                                "/v3/api-docs/",
+                                                "/v3/api-docs/**",
+                                                "/swagger-resources",
+                                                "/swagger-resources/**",
+                                                "/configuration/ui",
+                                                "/configuration/security",
+                                                "/swagger-ui/**",
+                                                "/webjars/**",
+                                                "/swagger-ui.html"
+                                        ).permitAll()
                                         .requestMatchers("/api/v1/users/**").permitAll()
                                         .requestMatchers("/test/**").permitAll()
                                         .anyRequest().authenticated()

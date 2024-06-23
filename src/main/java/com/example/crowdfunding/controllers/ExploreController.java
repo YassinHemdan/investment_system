@@ -7,11 +7,10 @@ import com.example.crowdfunding.dtos.ViewDepartmentDTO;
 
 import com.example.crowdfunding.services.servicesImpl.ExploreServiceImpl;
 import com.example.crowdfunding.services.servicesImpl.UserServiceImpl;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static com.example.crowdfunding.utils.ApiUri.EXPLORE_URI;
 import java.util.List;
@@ -19,11 +18,12 @@ import java.util.List;
 @RequestMapping(EXPLORE_URI)
 @AllArgsConstructor
 @RestController
+@CrossOrigin(origins = "http://localhost:4200")
 public class ExploreController {
     private final UserServiceImpl userService;
     private final ExploreServiceImpl exploreService;
     @GetMapping("/{username}/portfolio")
-    public OtherProfileDTO viewUserPortfolio(@PathVariable(name = "username") String username){
+    public OtherProfileDTO viewUserPortfolio(@PathVariable(name = "username") String username) throws Exception {
         return userService.otherProfile(username);
     }
 
@@ -34,10 +34,12 @@ public class ExploreController {
 
     @GetMapping("/investors")
     public List<InvestorDTO> findInvestors(){
-        return null;
+        return exploreService.findInvestors();
     }
+
     @GetMapping
     public List<DepartmentDTO> findDepartments(){
-        return null;
+        System.out.println("accessed");
+        return exploreService.findDepartments();
     }
 }

@@ -6,6 +6,6 @@ import com.example.crowdfunding.dtos.RegisterDTO;
 import org.springframework.http.ResponseEntity;
 
 public interface AuthenticationService {
-    ResponseEntity<String> register(RegisterDTO registerDTO);
+    ResponseEntity<String> register(RegisterDTO registerDTO) throws Exception;
     ResponseEntity<AuthResponseDTO> login(LoginDTO loginDTO);
 }

@@ -15,6 +15,6 @@ public class UserProfileDTO {
     private String country;
     private String city;
     private String street;
-
+    private String phone;
     // TODO: ADD phone attribute
 }

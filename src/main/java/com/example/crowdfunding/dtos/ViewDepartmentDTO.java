@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Setter
 @Getter
@@ -19,6 +20,8 @@ public class ViewDepartmentDTO {
     private String street;
     private double area;
     private double availableArea;
-    private BigDecimal price;
-    private BigDecimal tokenPrice;
+    private double price;
+    private double tokenPrice;
+    // TODO
+    private List<PriceHistoryDTO> priceHistoryDTOList; // sorted
 }

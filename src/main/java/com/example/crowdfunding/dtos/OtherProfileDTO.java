@@ -14,5 +14,7 @@ import java.util.List;
 public class OtherProfileDTO {
     private String userName;
     private int numberOfFollowers;
+    private boolean isAFollower;
+    private boolean isAFollowee;
     private List<UserPortfolioDTO> userPortfolioDTO;
 }

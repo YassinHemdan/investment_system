@@ -29,7 +29,7 @@ public class PriceHistory extends BaseEntity{
     private int id;
 
     @Column(nullable = false)
-    private BigDecimal price;
+    private double price;
 
     @Column(nullable = false)
     private LocalDate date;

@@ -16,5 +16,5 @@ public class AddDepartmentDTO {
     private String city;
     private String street;
     private double area;
-    private BigDecimal price;
+    private double price;
 }

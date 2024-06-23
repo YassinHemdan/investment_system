@@ -1,7 +1,9 @@
 package com.example.crowdfunding.repos;
 
 import com.example.crowdfunding.dtos.*;
+import com.example.crowdfunding.entities.Authority;
 import com.example.crowdfunding.entities.UserEntity;
+import org.apache.catalina.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -37,4 +39,28 @@ public interface UserRepo extends JpaRepository<UserEntity, Integer> {
 
     @Query
     Boolean existsByUserName(String username);
+
+    @Query(
+            nativeQuery = true,
+            value = """
+                    with q as(
+                    	select i.user_id as id from investments i
+                    )select distinct * from users u , q where u.user_id = q.id
+                    """
+    )
+    List<UserEntity> findInvestors();
+
+    @Query(nativeQuery = true , value = "SELECT * FROM users WHERE email = :email")
+    UserEntity findByEmail(String email);
+
+    @Query(nativeQuery = true , value = "SELECT * FROM users WHERE phone = :phone")
+    UserEntity findByPhone(String phone);
+
+    @Query(nativeQuery = true, value = "SELECT * FROM users u WHERE u.username = :username")
+    UserEntity getUserWithAuthorities(String username);
 }
+
+
+
+
+

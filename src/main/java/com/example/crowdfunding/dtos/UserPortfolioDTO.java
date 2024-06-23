@@ -19,8 +19,8 @@ public class UserPortfolioDTO { // returned to admin dashboard
     private String street;
     private double area;
     private double availableArea;
-    private BigDecimal price;
-    private BigDecimal tokenPrice;
-
+    private double price;
+    private double tokenPrice;
+    private int ownedTokens;
     // TODO: add a double attribute that contains the -> Total Invested Money
 }
